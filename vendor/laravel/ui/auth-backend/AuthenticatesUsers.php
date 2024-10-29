@@ -5,8 +5,6 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Cart;
-use App\Models\Product;
 use Illuminate\Validation\ValidationException;
 
 trait AuthenticatesUsers
@@ -49,7 +47,7 @@ trait AuthenticatesUsers
             if ($request->hasSession()) {
                 $request->session()->put('auth.password_confirmed_at', time());
             }
-                $this->checkCart();
+
             return $this->sendLoginResponse($request);
         }
 
@@ -201,28 +199,5 @@ trait AuthenticatesUsers
     protected function guard()
     {
         return Auth::guard();
-    }
-    
-    
-    protected function checkCart()
-    {
-        $cartItems = session()->get('cart', []);
-        $user_id = Auth::id();
-
-        if (!empty($cartItems)) {
-            foreach ($cartItems as $cartItem) {
-                // Fetch the product ID based on the product name
-                $product = Product::where('name', $cartItem['name'])->select('id')->first();
-
-                if ($product) {
-                    $cart = new Cart();
-                    $cart->user_id = $user_id;
-                    $cart->product_id = $product->id;
-                    $cart->quantity = $cartItem['quantity'];
-                    $cart->save();
-                }
-            }
-            session()->forget('cart');
-        }
     }
 }
