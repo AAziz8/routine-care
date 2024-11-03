@@ -14,6 +14,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\TruncateController;
 use Illuminate\Support\Facades\Artisan;
 
 
@@ -28,6 +29,9 @@ Route::get('/seed', function () {
     // Return a response indicating the seeding is complete
     return 'Database seeded successfully!';
 });
+
+Route::get('/truncate-tables', [TruncateController::class, 'truncateTables'])->name('tables.truncate');
+
 
 
 
@@ -119,7 +123,7 @@ Route::group(['middleware' => ['auth.admin']], function () {
 
     Route::get('/get-products-data', [ProductController::class, 'getPostsData'])->name('get.posts.data');
 
-    Route::get('admin/view-order/{id}', [\App\Http\Controllers\OrderController::class, 'view']);
+    Route::get('admin/view-order/{id}', [\App\Http\Controllers\OrderController::class, 'viewTransaction']);
 
     Route::get('order-history', [\App\Http\Controllers\OrderController::class, 'orderhistory']);
 
@@ -149,20 +153,20 @@ Route::post('/submit-form', [ProductController::class, 'cart_form'])->name('subm
 //Route::get('/contact', [CategoryController::class, 'showForm'])->name('contact.form');
 Route::post('/contact', [CategoryController::class, 'sendMessage'])->name('contact.send');
 
-    Route::get('cart', [CartController::class, 'cart'])->name('cart');
-    Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add_to_cart');
-    Route::patch('update-cart', [CartController::class, 'update'])->name('update_cart');
-    Route::delete('remove-from-cart', [CartController::class, 'remove'])->name('remove_from_cart');
 
 
-// Route::group(['middleware' => ['auth.check', 'verified']], function () {
+ Route::group(['middleware' => ['auth.check']], function () {
+     Route::get('cart', [CartController::class, 'cart'])->name('cart');
+     Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add_to_cart');
+     Route::patch('update-cart', [CartController::class, 'update'])->name('update_cart');
+     Route::delete('remove-from-cart', [CartController::class, 'remove'])->name('remove_from_cart');
 
     Route::get('/checkout', [\App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout');
     Route::post('/place-order', [CartController::class, 'pay_order'])->name('place-order');
     Route::get('orders', [UserOrderController::class, 'index'])->name('order-user');
     Route::get('order/{id}', [UserOrderController::class, 'view'])->name('users-orders');
 
-// });
+ });
 
 
 //for detail

@@ -181,15 +181,18 @@ class CartController extends Controller
 
     public function pay_order(Request $request)
     {
-
         $user = auth()->user();
         $order = new Order();
         $order->phone_number =$request->input('phone_number');
         $order->address =$request->input('address');
         $order->city =$request->input('city');
-        $order->zip_code =$request->input('zip_code');
+//        $order->zip_code =$request->input('zip_code');
         $order->user_id =$user->id;
-
+        $order->name = $request->input('name');
+        $order->payment_method = $request->input('paymentMethod');
+        if ($order == 'cash'){
+            $order->description = $request->input('description') ?? 'No Description';
+        }
         $total = 0;
         $cartitems_total = Cart::where('user_id' , Auth::id())->get();
         foreach ($cartitems_total as $prod)
@@ -214,11 +217,18 @@ class CartController extends Controller
 
 
         $order->save();
+        foreach ($cartitems_total as $item) {
+            $orderItem = new OrderItem();
+            $orderItem->order_id = $order->id; 
+            $orderItem->product_id = $item->product_id; 
+            $orderItem->quantity = $item->quantity; 
+            $orderItem->save(); 
+        }
 
-        $cartitems = Cart::where('user_id' , Auth::id())->get();
-        Cart::destroy($cartitems);
+        Cart::destroy($cartitems_total);
         return redirect('/')->with('success', 'Order successfully processed.It will be delivered soon');
     }
+
 
 //    public function success()
 //    {

@@ -15,7 +15,7 @@ class OrderController extends Controller
         return view('Transaction.index' ,compact('orders'));
     }
 
-    public function view($id){
+    public function viewTransaction($id){
 
         $orders = Order::with('user')->where('id' , $id)->first();
         return view('Transaction.view' , compact('orders'));
