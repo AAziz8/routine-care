@@ -152,12 +152,12 @@ Route::post('/submit-form', [ProductController::class, 'cart_form'])->name('subm
 //contact form
 //Route::get('/contact', [CategoryController::class, 'showForm'])->name('contact.form');
 Route::post('/contact', [CategoryController::class, 'sendMessage'])->name('contact.send');
+Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add_to_cart');
 
 
 
  Route::group(['middleware' => ['auth.check']], function () {
      Route::get('cart', [CartController::class, 'cart'])->name('cart');
-     Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add_to_cart');
      Route::patch('update-cart', [CartController::class, 'update'])->name('update_cart');
      Route::delete('remove-from-cart', [CartController::class, 'remove'])->name('remove_from_cart');
 
