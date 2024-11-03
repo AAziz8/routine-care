@@ -8,11 +8,6 @@
         height : 300px !important;
 
     }
-    
-    
-    
-    
-    
 </style>
 <?php
 $latest_products = App\helpers::latest();
@@ -150,70 +145,6 @@ $categories = \App\helpers::cate();
         <!--/ecommerce-single-->
         <div class="ecomrhny-content-inf py-5">
             <div class="container py-lg-5">
-                <!--/row1-->
-<!--                <div class="sp-store-single-page row">-->
-<!--                    <div class="col-lg-5 single-right-left">-->
-<!--                        <div class="flexslider1">-->
-
-<!--                            <ul class="slides">-->
-
-
-<!--                                @if ($details->image)-->
-<!--                                    @php-->
-<!--                                        $images = json_decode($details->image, true);-->
-<!--                                    @endphp-->
-
-<!--                                    @if (!empty($images) && is_array($images))-->
-<!--                                        @foreach ($images as $index => $image)-->
-<!--                                            <li data-thumb="{{ asset($image) }}">-->
-<!--                                                <div class="thumb-image">-->
-<!--                                                    <img src="{{ asset($image) }}" data-imagezoom="true" class="img-fluid" alt="{{ $details->alt }}">-->
-<!--                                                </div>-->
-<!--                                            </li>-->
-<!--                                        @endforeach-->
-<!--                                    @endif-->
-<!--                                @endif-->
-<!--                            </ul>-->
-<!--                            <div class="clearfix"></div>-->
-<!--                        </div>-->
-<!--                        <div class="eco-buttons mt-5">-->
-
-<!--                            <div class="transmitv single-item">-->
-
-<!--                                <button type="button" onclick="redirectToCart({{ $details->id }})" class="transmitv-cart ptransmitv-cart add-to-cart read-2">-->
-<!--                                    Add to Cart-->
-<!--                                </button>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="col-lg-7 single-right-left pl-lg-4">-->
-<!--                        <h3>{{$details->name}}-->
-<!--                        </h3>-->
-<!--                        <div class="caption">-->
-
-
-<!--                            <h6>-->
-
-<!--                                <span class="item_price">${{$details->price}}</span>-->
-<!--                            </h6>-->
-<!--                        </div>-->
-<!--                        <div class="desc_single my-4">-->
-<!--                            <ul class="emi-views">-->
-<!--                                <li><span>Special Price</span> Get extra {{$details->discount_price}}% off (price inclusive of discount)</li>-->
-<!--{{--                                <li><span>Bank Offer</span> 5% Unlimited Cashback on Flipkart Axis Bank Credit Card</li>--}}-->
-<!--{{--                                <li><span>Bank Offer</span> 5% Cashback* on HDFC Bank Debit Cards</li>--}}-->
-<!--{{--                                <li><span>Bank Offer</span> Extra 5% off* with Axis Bank Buzz Credit Card</li>--}}-->
-<!--                            </ul>-->
-<!--                        </div>-->
-<!--                        <div class="desc_single mb-12">-->
-<!--                            <h5>Description:</h5>-->
-<!--                            <p>{!! $details->description !!}</p>-->
-<!--                        </div>-->
-
-
-<!--                    </div>-->
-<!--                </div>-->
-
    <div class="card-container">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="card-thumbnail">
@@ -248,13 +179,16 @@ $categories = \App\helpers::cate();
                     <!--<p><i class="fa fa-angle-right"></i>Partner OfferSign up for Flipkart Pay Later and get Flipkart Gift Card worth up to ₹1000*</p>-->
                     <!--<p><i class="fa fa-angle-right"></i>Bank Offer5% Cashback on Flipkart Axis Bank</p>-->
 
-                    <div class="plusmins">
-                        <div class="input-group">
-                          <input type="button" value="-" class="button-minus" data-field="quantity">
-                          <input type="number" step="1" max="" value="1" name="quantity" class="quantity-field">
-                          <input type="button" value="+" class="button-plus" data-field="quantity">
-                        </div>
-                    </div>
+{{--                    <td data-th="Quantity">--}}
+{{--                        <div class="plusmins">--}}
+{{--                            <div class="input-group">--}}
+{{--                                <input type="button" value="-" class="button-minus btn btn-outline-secondary" data-field="quantity">--}}
+{{--                                <input type="number" step="1" min="1" max="" value="1" name="quantity" class="quantity-field cart_update form-control text-center" style="width: 60px;">--}}
+{{--                                <input type="button" value="+" class="button-plus btn btn-outline-secondary" data-field="quantity">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </td>--}}
+
 
                     <!--<a href="{{ route('add_to_cart', ['id' => $details->id]) }}" type = "button">Add To Cart</a>-->
                     <a type="button" href="{{ route('add_to_cart', ['id' => $details->id]) }}" class="add-to-cart-button">
@@ -341,49 +275,53 @@ $categories = \App\helpers::cate();
 
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
- 
- 
- 
-
-
-    
-
 <script type="text/javascript">
-    function incrementValue(e) {
-  e.preventDefault();
-  var fieldName = $(e.target).data('field');
-  var parent = $(e.target).closest('div');
-  var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
+    $(document).ready(function () {
+        function updateCart(ele) {
+            $.ajax({
+                url: '{{ route('update_cart') }}',
+                method: "patch",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id: ele.parents("tr").attr("data-id"),
+                    quantity: ele.parents("tr").find(".quantity-field").val()
+                },
+                success: function (response) {
+                    window.location.reload();
+                }
+            });
+        }
 
-  if (!isNaN(currentVal)) {
-    parent.find('input[name=' + fieldName + ']').val(currentVal + 1);
-  } else {
-    parent.find('input[name=' + fieldName + ']').val(0);
-  }
-}
+        $(".cart_update").change(function (e) {
+            e.preventDefault();
+            var ele = $(this);
+            updateCart(ele);
+        });
 
-function decrementValue(e) {
-  e.preventDefault();
-  var fieldName = $(e.target).data('field');
-  var parent = $(e.target).closest('div');
-  var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
+        $(".button-plus").click(function (e) {
+            e.preventDefault();
+            var inputField = $(this).siblings(".quantity-field");
+            var currentValue = parseInt(inputField.val());
 
-  if (!isNaN(currentVal) && currentVal > 0) {
-    parent.find('input[name=' + fieldName + ']').val(currentVal - 1);
-  } else {
-    parent.find('input[name=' + fieldName + ']').val(0);
-  }
-}
+            if (!isNaN(currentValue)) {
+                inputField.val(currentValue + 1);
+                inputField.change(); // Trigger the change event for AJAX update
+            }
+        });
 
-$('.input-group').on('click', '.button-plus', function(e) {
-  incrementValue(e);
-});
+        $(".button-minus").click(function (e) {
+            e.preventDefault();
+            var inputField = $(this).siblings(".quantity-field");
+            var currentValue = parseInt(inputField.val());
 
-$('.input-group').on('click', '.button-minus', function(e) {
-  decrementValue(e);
-});
-
+            if (!isNaN(currentValue) && currentValue > 1) {
+                inputField.val(currentValue - 1);
+                inputField.change(); // Trigger the change event for AJAX update
+            }
+        });
+    });
 </script>
+
 @endsection
 
 

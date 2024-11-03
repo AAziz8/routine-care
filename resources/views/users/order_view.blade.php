@@ -38,18 +38,9 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="zip_code"><b>Zip Code:</b></label>
-                                    <input type="text" class="form-control" name="zip_code"
-                                           value="{{$orders->zip_code}}">
-                                </div>
-
-
-                                <div class="form-group">
                                     <label for="city"><b>City:</b></label>
                                     <input type="text" class="form-control" name="city" value="{{$orders->city}}">
                                 </div>
-
-
                                 <div class="form-group">
                                     <label for="Address"><b>Address:</b></label>
                                     <textarea cols="4" rows="4" class="form-control">{{$orders->address}}</textarea>

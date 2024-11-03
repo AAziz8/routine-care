@@ -3,6 +3,25 @@
 
 @section('content')
     <style>
+        .form-check-input {
+            margin-right: 8px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+        .form-check-label {
+            display: inline-block;
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        .form-check {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .form-check:hover {
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
         body {
             background-color: #f8f9fa;
             margin-bottom: 50px; /* Add some space at the bottom of the body */
@@ -62,6 +81,10 @@
                 text-align: left;
             }
         }
+
+        .required-field {
+            color: red;
+        }
     </style>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -83,62 +106,66 @@
                             </div>
                         @endif
                         <form role="form" action="{{route('place-order')}}" method="post" class="require-validation"
-                              data-cc-on-file="false" data-stripe-publishable-key="{{ env('STRIPE_KEY') }}" id="payment-form">
+                              data-cc-on-file="false" data-stripe-publishable-key="{{ env('STRIPE_KEY') }}"
+                              id="payment-form">
                             @csrf
 
                             <div class="form-group">
-                                <label for="phone_number">Phone Number:</label>
+                                <label for="name">Full Name:</label>
+                                @if(\Illuminate\Support\Facades\Auth::user())
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           value="{{\Illuminate\Support\Facades\Auth::user()->name }}">
+                                @endif
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone_number">Mobile number:<span class="required-field">*</span></label>
                                 <input type="text" class="form-control" id="phone_number" name="phone_number" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="address">Address:</label>
-                                <input type="text" class="form-control" id="address" name="address" required>
+                                <label for="address">Address:<span class="required-field">*</span></label>
+                                <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label for="city">City:</label>
+                                <label for="city">City:<span class="required-field">*</span></label>
                                 <input type="text" class="form-control" id="city" name="city" required>
                             </div>
-
-                            <div class="form-group">
-                                <label for="zip_code">Zip Code:</label>
-                                <input type="text" class="form-control" id="zip_code" name="zip_code" required>
+                            <div class="col-md-12 mb-3">
+                                <label for="payment-method" class="form-label"><strong>Select Payment Method:</strong></label>
+                                <div class="d-flex justify-content-between">
+                                    <div class="form-check p-3 border rounded shadow-sm" style="flex: 1; margin-right: 10px;">
+                                        <input type="radio" id="cashOnDelivery" name="paymentMethod" value="cash"
+                                               class="form-check-input" onclick="showPaymentDescription()">
+                                        <label for="cashOnDelivery" class="form-check-label">
+                                            <i class="fa fa-money-bill-wave" style="color: green;"></i> Cash on Delivery
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-3 border rounded shadow-sm" style="flex: 1;">
+                                        <input type="radio" id="onlinePayment" name="paymentMethod" value="online"
+                                               class="form-check-input" onclick="showPaymentDescription()">
+                                        <label for="onlinePayment" class="form-check-label">
+                                            <i class="fa fa-credit-card" style="color: blue;"></i> Online Payment
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!--<div class='form-row row'>-->
-                            <!--    <div class='col-xs-12 col-md-6 form-group required'>-->
-                            <!--        <label class='control-label'>Name on Card</label>-->
-                            <!--        <input class='form-control' size='4' type='text' name='name-on-card' required>-->
-                            <!--    </div>-->
-                            <!--    <div class='col-xs-12 col-md-6 form-group required'>-->
-                            <!--        <label class='control-label'>Card Number</label> <input autocomplete='off'-->
-                            <!--                                                                class='form-control card-number'-->
-                            <!--                                                                size='20' type='text' required>-->
-                            <!--    </div>-->
-                            <!--</div>-->
+                            <div id="cashDescription" class="mt-3 alert alert-info" style="display: none;">
+                                <p>Please provide any special delivery instructions:</p>
+                                <textarea class="form-control" name="delivery_instruction" rows="3" placeholder="Write your instructions here..."></textarea>
+                            </div>
 
-                            <!--<div class='form-row row'>-->
-                            <!--    <div class='col-xs-12 col-md-4 form-group cvc required'>-->
-                            <!--        <label class='control-label'>CVC</label> <input autocomplete='off'-->
-                            <!--                                                        class='form-control card-cvc'-->
-                            <!--                                                        placeholder='ex. 311' size='4' type='text'-->
-                            <!--                                                        required>-->
-                            <!--    </div>-->
-                            <!--    <div class='col-xs-12 col-md-4 form-group expiration required'>-->
-                            <!--        <label class='control-label'>Expiration Month</label> <input-->
-                            <!--            class='form-control card-expiry-month' placeholder='MM' size='2' type='text'-->
-                            <!--            required>-->
-                            <!--    </div>-->
-                            <!--    <div class='col-xs-12 col-md-4 form-group expiration required'>-->
-                            <!--        <label class='control-label'>Expiration Year</label> <input-->
-                            <!--            class='form-control card-expiry-year' placeholder='YYYY' size='4' type='text'-->
-                            <!--            required>-->
-                            <!--    </div>-->
-                            <!--</div>-->
+                            <div id="onlineDescription" class="mt-3 alert alert-warning" style="display: none;">
+                                <p>You can contact us on WhatsApp for more information: <a href="https://wa.me/00923302065791" target="_blank">0092-330-2065791</a></p>
+                            </div>
 
                             <div class="col-xs-12">
-                                <p>Total Amount: $<span id="total-amount">{{ $cartTotal }}</span></p>
+                                <b><p>Total Amount: $<span id="total-amount">{{ $cartTotal }}</span></p></b>
+                            </div>
+                            <div>
+
                             </div>
 
                             <div class="row">
@@ -164,21 +191,21 @@
                             </tr>
                             </thead>
                             <tbody>
-                                @foreach($orderItems as $order)
-                                    @if(is_array($order))
+                            @foreach($orderItems as $order)
+                                @if(is_array($order))
                                     <tr>
                                         <td>{{ $order['name'] }}</td>
                                         <td>${{ $order['price'] }}</td>
                                         <td>{{ $order['quantity'] }}</td>
                                     </tr>
-                                    @else
+                                @else
                                     <tr>
                                         <td>{{ $order->product->name }}</td>
                                         <td>${{ $order->product->price }}</td>
                                         <td>{{ $order->quantity }}</td>
                                     </tr>
-                                    @endif
-                                    @endforeach
+                                @endif
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -230,7 +257,7 @@
     <!--                    .find('.alert')-->
     <!--                    .text(response.error.message);-->
     <!--            } else {-->
-                    
+
     <!--                var token = response['id'];-->
     <!--                $form.find('input[type=text]').empty();-->
     <!--                $form.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");-->
@@ -239,5 +266,20 @@
     <!--        }-->
     <!--    });-->
     <!--</script>-->
+    <script type="text/javascript">
+        function showPaymentDescription() {
+            const cashDesc = document.getElementById('cashDescription');
+            const onlineDesc = document.getElementById('onlineDescription');
+            const cashRadio = document.getElementById('cashOnDelivery');
+            const onlineRadio = document.getElementById('onlinePayment');
 
+            if (cashRadio.checked) {
+                cashDesc.style.display = 'block';
+                onlineDesc.style.display = 'none';
+            } else if (onlineRadio.checked) {
+                cashDesc.style.display = 'none';
+                onlineDesc.style.display = 'block';
+            }
+        }
+    </script>
 @endsection

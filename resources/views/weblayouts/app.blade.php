@@ -30,7 +30,7 @@ $logos = App\helpers::logo();
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>-->
     <link rel="icon" type="image/x-icon" href="{{asset('images/upperlogo.png')}}">
-    <link rel="stylesheet" href="{{ asset('public/webassets/css/style-liberty.css') }}">
+    <link rel="stylesheet" href="{{ asset('webassets/css/style-liberty.css') }}">
     <style>
         .table-bordered tbody tr {
             border: 1px solid #ccc;
